@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -86,19 +86,19 @@ model Product {
 }
 
 model Post {
-  id                String           @id @default(uuid()) @db.Uuid
-  userId            Int              @map("user_id")
-  linkVideo         String           @map("link_video")
-  thumbnail         String?
-  name              String
-  description       String?          @db.Text
-  cookingSteps      String?          @map("cooking_steps") @db.Text
-  tagVideo          String           @map("tag_video")
-  status            String           @default("DRAFT")
-  createdAt         DateTime         @default(now()) @map("created_at")
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipeItems       RecipeItem[]
-  orderItems        OrderItem[]
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       Int          @map("user_id")
+  linkVideo    String       @map("link_video")
+  thumbnail    String?
+  name         String
+  description  String?      @db.Text
+  cookingSteps String?      @map("cooking_steps") @db.Text
+  tagVideo     String       @map("tag_video")
+  status       String       @default("DRAFT")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeItems  RecipeItem[]
+  orderItems   OrderItem[]
 
   @@map("posts")
 }
@@ -126,7 +126,6 @@ model RecipeItem {
 
   @@map("recipe_items")
 }
-
 
 model Order {
   id         Int         @id @default(autoincrement())

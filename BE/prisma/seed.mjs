@@ -1,16 +1,8 @@
 import 'dotenv/config';
-import { PrismaClient } from '../src/generated/prisma/index.js';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-
-const prisma = new PrismaClient({
-    adapter,
-    log: ['query', 'info', 'warn', 'error'],
-});
+const prisma = new PrismaClient();
 
 async function main() {
     try {
@@ -43,63 +35,72 @@ async function main() {
 
         console.log('✅ Roles created:', roles.map((r) => r.code).join(', '));
 
-        // Seed Admin User
-        console.log('👤 Creating admin user...');
-        const hashedPassword = await bcrypt.hash('admin123', 10);
+        // Create 4 test users
+        const testUsers = [
+            { email: 'admin@savore.com', password: 'admin123', fullName: 'Admin User', roleCode: 'ADMIN' },
+            { email: 'creator@savore.com', password: 'creator123', fullName: 'Creator User', roleCode: 'CREATOR' },
+            { email: 'user@savore.com', password: 'user123', fullName: 'Normal User', roleCode: 'USER' },
+            { email: 'supplier@savore.com', password: 'supplier123', fullName: 'Supplier User', roleCode: 'SUPPLIER' },
+        ];
 
-        const adminUser = await prisma.user.upsert({
-            where: { email: 'admin@savore.com' },
-            update: {},
-            create: {
-                email: 'admin@savore.com',
-                passwordHash: hashedPassword,
-                fullName: 'System Administrator',
-            },
-        });
+        for (const userData of testUsers) {
+            console.log(`👤 Creating ${userData.roleCode} user: ${userData.email}...`);
 
-        console.log('✅ Admin user created:', adminUser.email);
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-        // Assign ADMIN role to admin user
-        console.log('🔑 Assigning ADMIN role...');
-        const adminRole = roles.find((r) => r.code === 'ADMIN');
-
-        if (adminRole) {
-            await prisma.userRole.upsert({
-                where: {
-                    userId_roleId: {
-                        userId: adminUser.id,
-                        roleId: adminRole.id,
-                    },
-                },
+            const user = await prisma.user.upsert({
+                where: { email: userData.email },
                 update: {},
                 create: {
-                    userId: adminUser.id,
-                    roleId: adminRole.id,
+                    email: userData.email,
+                    passwordHash: hashedPassword,
+                    fullName: userData.fullName,
                 },
             });
-            console.log('✅ ADMIN role assigned to admin user');
+
+            console.log(`✅ User created: ${user.email}`);
+
+            // Assign role
+            const role = roles.find((r) => r.code === userData.roleCode);
+            if (role) {
+                await prisma.userRole.upsert({
+                    where: {
+                        userId_roleId: {
+                            userId: user.id,
+                            roleId: role.id,
+                        },
+                    },
+                    update: {},
+                    create: {
+                        userId: user.id,
+                        roleId: role.id,
+                    },
+                });
+                console.log(`✅ ${userData.roleCode} role assigned`);
+            }
+
+            // Create wallet
+            await prisma.wallet.upsert({
+                where: { userId: user.id },
+                update: {},
+                create: {
+                    userId: user.id,
+                    balance: 0,
+                    currency: 'VND',
+                },
+            });
+            console.log(`✅ Wallet created for ${userData.email}`);
         }
 
-        // Create wallet for admin user
-        console.log('💰 Creating wallet for admin user...');
-        await prisma.wallet.upsert({
-            where: { userId: adminUser.id },
-            update: {},
-            create: {
-                userId: adminUser.id,
-                balance: 0,
-                currency: 'VND',
-            },
-        });
-        console.log('✅ Wallet created for admin user');
-
-        console.log('🎉 Database seeding completed successfully!');
+        console.log('\n🎉 Database seeding completed successfully!');
         console.log('\n📋 Summary:');
         console.log('- Roles: 4 (ADMIN, CREATOR, USER, SUPPLIER)');
-        console.log('- Users: 1 (admin@savore.com)');
-        console.log('- Admin credentials:');
-        console.log('  Email: admin@savore.com');
-        console.log('  Password: admin123');
+        console.log('- Users: 4');
+        console.log('\n📝 Test accounts:');
+        console.log('  Admin:    admin@savore.com / admin123');
+        console.log('  Creator:  creator@savore.com / creator123');
+        console.log('  User:     user@savore.com / user123');
+        console.log('  Supplier: supplier@savore.com / supplier123');
     } catch (error) {
         console.error('❌ Error during seeding:');
         console.error(error);
