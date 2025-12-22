@@ -1,34 +1,16 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsIn, IsNumber, Min, Max } from 'class-validator';
+import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RegisterDto {
-    @ApiProperty({ example: 'user@savore.com' })
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
-
-    @ApiProperty({ example: 'password123', minLength: 6 })
-    @IsString()
-    @IsNotEmpty()
-    @MinLength(6)
-    password: string;
-
+export class UpdateProfileDto {
     @ApiProperty({ example: 'Nguyễn Văn A', required: false })
     @IsString()
     @IsOptional()
     fullName?: string;
 
-    @ApiProperty({ example: 'SUPPLIER', enum: ['USER', 'CREATOR', 'SUPPLIER'] })
-    @IsString()
-    @IsNotEmpty()
-    @IsIn(['USER', 'CREATOR', 'SUPPLIER'])
-    role: 'USER' | 'CREATOR' | 'SUPPLIER';
-
-    // ==================== YÊU CẦU MENTOR #1: PROVIDER ADDRESS ====================
     @ApiProperty({
         example: '123 Nguyễn Huệ, Quận 1, TP.HCM',
         required: false,
-        description: 'Địa chỉ đầy đủ (dùng để hiển thị trên Google Maps)'
+        description: 'Địa chỉ đầy đủ'
     })
     @IsString()
     @IsOptional()

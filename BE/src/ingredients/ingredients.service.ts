@@ -22,10 +22,13 @@ export class IngredientsService {
         });
     }
 
-    async findAll(page: number = 1, limit: number = 10, tag?: string) {
+    // ==================== YÊU CẦU MENTOR #4: FILTER BY PROVIDER ID ====================
+    async findAll(page: number = 1, limit: number = 10, tag?: string, providerId?: number) {
         const skip = (page - 1) * limit;
 
-        const where = tag ? { tag } : {};
+        const where: any = {};
+        if (tag) where.tag = tag;
+        if (providerId) where.providerId = providerId; // ← FILTER THEO PROVIDER ID
 
         const [ingredients, total] = await Promise.all([
             this.prisma.ingredient.findMany({
@@ -38,6 +41,9 @@ export class IngredientsService {
                             id: true,
                             email: true,
                             fullName: true,
+                            address: true,      // ← Thêm address
+                            latitude: true,     // ← Thêm GPS
+                            longitude: true,    // ← Thêm GPS
                         },
                     },
                 },
@@ -68,6 +74,9 @@ export class IngredientsService {
                         id: true,
                         email: true,
                         fullName: true,
+                        address: true,
+                        latitude: true,
+                        longitude: true,
                     },
                 },
             },

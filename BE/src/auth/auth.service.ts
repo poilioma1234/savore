@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -31,6 +32,9 @@ export class AuthService {
                 email: registerDto.email,
                 passwordHash: hashedPassword,
                 fullName: registerDto.fullName,
+                address: registerDto.address,
+                latitude: registerDto.latitude,
+                longitude: registerDto.longitude,
             },
         });
 
@@ -146,9 +150,58 @@ export class AuthService {
             id: user.id,
             email: user.email,
             fullName: user.fullName,
+            address: user.address,
+            latitude: user.latitude,
+            longitude: user.longitude,
             roles,
             wallet: user.wallet,
             createdAt: user.createdAt,
         };
     }
+
+    // ==================== YÊU CẦU MENTOR: UPDATE PROFILE API ====================
+    async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+        // Check if user exists
+        const existingUser = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!existingUser) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Update user
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                fullName: updateProfileDto.fullName,
+                address: updateProfileDto.address,
+                latitude: updateProfileDto.latitude,
+                longitude: updateProfileDto.longitude,
+            },
+            include: {
+                userRoles: {
+                    include: {
+                        role: true,
+                    },
+                },
+                wallet: true,
+            },
+        });
+
+        const roles = updatedUser.userRoles.map((ur) => ur.role.code);
+
+        return {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            fullName: updatedUser.fullName,
+            address: updatedUser.address,
+            latitude: updatedUser.latitude,
+            longitude: updatedUser.longitude,
+            roles,
+            wallet: updatedUser.wallet,
+            createdAt: updatedUser.createdAt,
+        };
+    }
 }
+
