@@ -178,4 +178,103 @@ export class PostsService {
             where: { id },
         });
     }
+
+    /**
+     * API ĐẶC BIỆT THEO YÊU CẦU MENTOR:
+     * - Nhận list ID của các bài đăng
+     * - Lấy dữ liệu công thức của các bài đăng đó
+     * - Nhóm các loại nguyên liệu cùng ID với nhau
+     * - Cộng dồn số lượng
+     * - Trả về list nguyên liệu dạng object "tên nguyên liệu + tổng số lượng"
+     */
+    async calculateIngredients(postIds: string[]) {
+        // Lấy tất cả recipe items từ các posts
+        const recipeItems = await this.prisma.recipeItem.findMany({
+            where: {
+                postId: {
+                    in: postIds,
+                },
+            },
+            include: {
+                ingredient: {
+                    include: {
+                        provider: {
+                            select: {
+                                id: true,
+                                email: true,
+                                fullName: true,
+                                address: true,
+                                latitude: true,
+                                longitude: true,
+                            },
+                        },
+                    },
+                },
+                post: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        // Nhóm theo ingredientId và cộng dồn số lượng
+        const ingredientMap = new Map<string, {
+            ingredientId: string;
+            ingredientName: string;
+            tag: string;
+            totalQuantity: number;
+            unit: string;
+            provider: any;
+            usedInPosts: Array<{ postId: string; postName: string; quantity: number }>;
+        }>();
+
+        for (const item of recipeItems) {
+            const key = item.ingredientId;
+
+            if (ingredientMap.has(key)) {
+                const existing = ingredientMap.get(key)!;
+                existing.totalQuantity += Number(item.quantity);
+                existing.usedInPosts.push({
+                    postId: item.post.id,
+                    postName: item.post.name,
+                    quantity: Number(item.quantity),
+                });
+            } else {
+                ingredientMap.set(key, {
+                    ingredientId: item.ingredient.id,
+                    ingredientName: item.ingredient.name,
+                    tag: item.ingredient.tag,
+                    totalQuantity: Number(item.quantity),
+                    unit: item.unit || 'gram',
+                    provider: item.ingredient.provider,
+                    usedInPosts: [{
+                        postId: item.post.id,
+                        postName: item.post.name,
+                        quantity: Number(item.quantity),
+                    }],
+                });
+            }
+        }
+
+        // Convert Map to Array
+        const aggregatedIngredients = Array.from(ingredientMap.values()).map(item => ({
+            ingredientId: item.ingredientId,
+            ingredientName: item.ingredientName,
+            tag: item.tag,
+            totalQuantity: item.totalQuantity,
+            unit: item.unit,
+            provider: item.provider,
+            usedInPosts: item.usedInPosts,
+        }));
+
+        return {
+            postIds,
+            totalPosts: postIds.length,
+            totalIngredients: aggregatedIngredients.length,
+            ingredients: aggregatedIngredients,
+        };
+    }
 }
+

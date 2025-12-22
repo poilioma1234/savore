@@ -12,6 +12,9 @@ model User {
   email                String       @unique
   passwordHash         String       @map("password_hash")
   fullName             String?      @map("full_name")
+  address              String?      @db.Text
+  latitude             Decimal?     @db.Decimal(10, 8)
+  longitude            Decimal?     @db.Decimal(11, 8)
   createdAt            DateTime     @default(now()) @map("created_at")
   commissions          Commission[]
   orderItemsAsCreator  OrderItem[]  @relation("CreatorOrderItems")
