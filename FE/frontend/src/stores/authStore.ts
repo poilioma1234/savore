@@ -71,39 +71,8 @@ export const useAuthStore = create<AuthState>()(
             get().setUser(user);
             get().setToken({ accessToken: token });
             get().setAuthenticated(true);
-            
-            // Special case for admin login - if username is "admin" and password is "admin", redirect directly to dashboard without API call
-            if (usernameOrEmail === 'admin' && password === 'admin') {
-              get().setUser({
-                id: 'admin-id',
-                username: 'admin',
-                email: 'admin@example.com',
-                role: 'ADMIN',
-                status: 'ACTIVE',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              });
-              get().setToken({ accessToken: 'admin-token' });
-              get().setAuthenticated(true);
-              localStorage.setItem('user', JSON.stringify({
-                id: 'admin-id',
-                username: 'admin',
-                email: 'admin@example.com',
-                role: 'ADMIN',
-                status: 'ACTIVE',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              }));
-              localStorage.setItem('accessToken', 'admin-token');
-              window.location.href = '/dashboard';
-              return;
-            }
 
-            // Check if user is admin - if so, redirect to dashboard without API call
-            if (user.role === 'ADMIN') {
-              window.location.href = '/dashboard';
-              return;
-            }
+            // Check if user is admin - no longer need to redirect as React Router will handle this
           } catch (error) {
             console.error('Failed to parse user data:', error);
             // Clear invalid data
@@ -141,7 +110,6 @@ export const useAuthStore = create<AuthState>()(
             updatedAt: new Date().toISOString()
           }));
           localStorage.setItem('accessToken', 'admin-token');
-          window.location.href = '/dashboard';
           return;
         }
 

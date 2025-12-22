@@ -7,6 +7,10 @@ import { useAuthStore } from '@/stores/authStore'
 import './App.css'
 import LoginPage from './pages/auth/login/LoginPage'
 import RegisterPage from './pages/auth/register/RegisterPage'
+import MainLayout from '@/components/layout/MainLayout'
+import ListPage from '@/pages/ListPage'
+import VideoPage from '@/pages/VideoPage'
+import ShopPage from '@/pages/ShopPage'
 
 // AuthRoute component to protect routes
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -42,29 +46,74 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
-          <Route path="/home" element={<HomePage />} />
+          <Route 
+            path="/home" 
+            element={
+              <MainLayout>
+                <HomePage />
+              </MainLayout>
+            } 
+          />
           <Route 
             path="/login" 
             element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
+              <MainLayout showHeader={false}>
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              </MainLayout>
             } 
           />
           <Route 
             path="/register" 
             element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
+              <MainLayout showHeader={false}>
+                <PublicRoute>
+                  <RegisterPage />
+                </PublicRoute>
+              </MainLayout>
             } 
           />
           <Route 
             path="/dashboard" 
             element={
-              <AuthRoute>
-                <DashboardPage />
-              </AuthRoute>
+              <MainLayout>
+                <AuthRoute>
+                  <DashboardPage />
+                </AuthRoute>
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/list" 
+            element={
+              <MainLayout>
+                <ListPage />
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/video" 
+            element={
+              <MainLayout showFooter= {false}>
+                <VideoPage />
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/video/:id" 
+            element={
+              <MainLayout showFooter= {false}>
+                <VideoPage />
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/shop" 
+            element={
+              <MainLayout>
+                <ShopPage />
+              </MainLayout>
             } 
           />
         </Routes>
