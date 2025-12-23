@@ -13,6 +13,8 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
+import { authService } from "@/services/authService";
+import type { LoginRequest } from "@/types/auth";
 import { 
   containerStyle, 
   cardStyle, 
@@ -26,7 +28,7 @@ const { Title } = Typography;
 
 // Form value interfaces
 interface LoginFormValues {
-  usernameOrEmail: string;
+  email: string;
   password: string;
   remember: boolean;
 }
@@ -45,30 +47,72 @@ interface ApiError {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, isAuthenticated } = useAuthStore();
   const { message } = App.useApp();
   const [error, setError] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
 
   // Check if user is already logged in and redirect to dashboard
-  const { isAuthenticated } = useAuthStore();
-  
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
+  // Validate email format
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Handle email change
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    form.setFieldsValue({ email });
+    
+    if (email && !validateEmail(email)) {
+      setEmailError("Email không đúng định dạng");
+    } else {
+      setEmailError("");
+    }
+  };
+
   const onFinish = async (values: LoginFormValues) => {
     setError(""); // Reset error state
     
-    if (!values.usernameOrEmail || !values.password) {
-      setError("Vui lòng nhập tên đăng nhập/email và mật khẩu");
+    if (!values.email || !values.password) {
+      setError("Vui lòng nhập email và mật khẩu");
+      return;
+    }
+
+    if (!validateEmail(values.email)) {
+      setError("Email không đúng định dạng");
       return;
     }
 
     try {
-      await login(values.usernameOrEmail, values.password, values.remember);
-      message.success("Xác thực thành công");
+      const loginRequest: LoginRequest = {
+        email: values.email,
+        password: values.password
+      };
+      
+      const authResponse = await authService.login(loginRequest);
+      
+      // Lưu thông tin authentication vào localStorage
+      localStorage.setItem('accessToken', authResponse.accessToken);
+      localStorage.setItem('refreshToken', authResponse.refreshToken);
+      localStorage.setItem('user', JSON.stringify(authResponse.user));
+      
+      // Cập nhật state trong store
+      login(authResponse.accessToken, {
+        ...authResponse.user,
+        id: authResponse.user.id.toString(),
+        status: 'ACTIVE',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      
+      message.success("Đăng nhập thành công");
       navigate("/dashboard");
     } catch (error: unknown) {
       console.error(error);
@@ -99,25 +143,35 @@ const LoginPage: React.FC = () => {
           name="login"
           initialValues={{ remember: true }}
           onFinish={onFinish}
+          layout="vertical"
+          size="large"
         >
           <Form.Item
-            name="usernameOrEmail"
+            name="email"
+            label="Email"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập tên đăng nhập hoặc email!",
+                message: "Vui lòng nhập email!",
               },
+              {
+                type: "email",
+                message: "Email không đúng định dạng!",
+              }
             ]}
+            validateStatus={emailError ? "error" : undefined}
+            help={emailError}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Tên đăng nhập hoặc email"
-              size="large"
+              placeholder="Email"
+              onChange={handleEmailChange}
             />
           </Form.Item>
 
           <Form.Item
             name="password"
+            label="Mật khẩu"
             rules={[
               {
                 required: true,
@@ -128,7 +182,6 @@ const LoginPage: React.FC = () => {
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="Mật khẩu"
-              size="large"
             />
           </Form.Item>
 
@@ -142,6 +195,7 @@ const LoginPage: React.FC = () => {
               htmlType="submit"
               loading={isLoading}
               style={buttonStyle}
+              block
             >
               Đăng nhập
             </Button>

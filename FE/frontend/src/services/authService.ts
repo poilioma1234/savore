@@ -1,105 +1,66 @@
-import { axiosClient } from "@/api/axiosClient";
+import { API_ENDPOINTS } from '../config/api';
+import { LoginRequest, RegisterRequest, AuthResponse, ApiResponse, ApiError } from '../types/auth';
 
-interface LoginRequest {
-  usernameOrEmail: string;
-  password: string;
-}
-
-interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  message: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    avatarUrl?: string;
-    fullName?: string;
-    bio?: string;
-    role: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  accessToken: string;
-}
-
-interface RegisterResponse {
-  message: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    role: string;
-    createdAt: string;
-  };
-  accessToken: string;
-}
-
-interface ProfileResponse {
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    avatarUrl?: string;
-    fullName?: string;
-    bio?: string;
-    role: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-}
-
+// Service xử lý authentication
 export const authService = {
-  async login(data: LoginRequest): Promise<LoginResponse> {
-    try {
-      // Send the field as usernameOrEmail to the backend
-      const loginData = {
-        usernameOrEmail: data.usernameOrEmail,
-        password: data.password
-      };
-      
-      const response = await axiosClient.post<LoginResponse>("/api/auth/login", loginData);
-      return response.data;
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+  // Đăng nhập
+  login: async (credentials: LoginRequest): Promise<AuthResponse> => {
+    const response = await fetch(API_ENDPOINTS.LOGIN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Đăng nhập thất bại');
     }
+
+    return await response.json();
   },
 
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    try {
-      const response = await axiosClient.post<RegisterResponse>("/api/auth/register", data);
-      return response.data;
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+  // Đăng ký
+  register: async (userData: RegisterRequest): Promise<AuthResponse> => {
+    const response = await fetch(API_ENDPOINTS.REGISTER, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Đăng ký thất bại');
     }
+
+    return await response.json();
   },
 
-  async getProfile(): Promise<ProfileResponse> {
-    try {
-      const response = await axiosClient.get<ProfileResponse>("/api/auth/profile");
-      return response.data;
-    } catch (error) {
-      console.error("Get profile error:", error);
-      throw error;
+  // Làm mới token
+  refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
+    const response = await fetch(API_ENDPOINTS.REFRESH_TOKEN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Làm mới token thất bại');
     }
+
+    return await response.json();
   },
 
-  async logout(): Promise<void> {
-    try {
-      // Clear the token from local storage
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-    } catch (error) {
-      console.error("Logout error:", error);
-      throw error;
-    }
+  // Đăng xuất
+  logout: async (): Promise<void> => {
+    // Xóa token khỏi localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
   },
 };

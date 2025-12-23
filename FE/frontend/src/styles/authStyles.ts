@@ -13,16 +13,16 @@ export const containerStyle: React.CSSProperties = {
 };
 
 export const cardStyle: React.CSSProperties = {
-  width: "400px",
+  width: "550px",
   backgroundColor: "rgba(255, 255, 255, 0.9)",
   borderRadius: "12px",
-  padding: "40px",
+  padding: "30px",
   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
 };
 
 export const titleStyle: React.CSSProperties = {
   textAlign: "center",
-  marginBottom: "30px",
+  marginBottom: "12px",
   color: "#FF7A18",
   fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   fontSize: "28px",
@@ -40,12 +40,10 @@ export const buttonStyle: React.CSSProperties = {
 export const errorStyle: React.CSSProperties = {
   color: "#ff4d4f",
   textAlign: "center",
-  marginTop: "10px",
   fontSize: "14px",
 };
 
 export const linkStyle: React.CSSProperties = {
   textAlign: "center",
   display: "block",
-  marginTop: "15px",
 };
