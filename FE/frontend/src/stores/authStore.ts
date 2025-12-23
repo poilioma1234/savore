@@ -34,7 +34,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -56,8 +56,8 @@ export const useAuthStore = create<AuthState>()(
       
       initializeAuth: () => {
         // Check localStorage first
-        let accessToken = localStorage.getItem('accessToken');
-        let refreshToken = localStorage.getItem('refreshToken');
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
         const userStr = localStorage.getItem('user');
         
         if (accessToken && userStr) {

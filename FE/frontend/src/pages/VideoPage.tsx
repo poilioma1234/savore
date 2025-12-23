@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import type { ReactNode } from 'react';
-import { Avatar, Spin, message } from 'antd';
+import { Avatar, Button, Spin, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS } from '../config/api';
@@ -60,7 +59,7 @@ interface RelatedVideo {
 const VideoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   // Track current video index
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   // Track if video is transitioning (to prevent rapid video switching)
@@ -69,7 +68,7 @@ const VideoPage: React.FC = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   // Track video element for direct manipulation
   const videoRef = useRef<HTMLIFrameElement>(null);
-  
+
   // State cho dữ liệu video và video liên quan
   const [videoDetail, setVideoDetail] = useState<PostDetail | null>(null);
   const [relatedVideos, setRelatedVideos] = useState<RelatedVideo[]>([]);
@@ -78,10 +77,10 @@ const VideoPage: React.FC = () => {
   // Tạo dữ liệu video liên quan mẫu
   const generateRelatedVideos = (): RelatedVideo[] => {
     const dishes = [
-      "Phở Bò Hà Nội", "Bún Chả Hà Nội", "Bánh Mì Sài Gòn", 
+      "Phở Bò Hà Nội", "Bún Chả Hà Nội", "Bánh Mì Sài Gòn",
       "Cơm Tấm Sài Gòn", "Bún Bò Huế", "Mì Quảng"
     ];
-    
+
     return Array.from({ length: 6 }, (_, i) => ({
       id: i + 1,
       title: `Hướng dẫn làm ${dishes[i % dishes.length]}`,
@@ -99,7 +98,7 @@ const VideoPage: React.FC = () => {
   useEffect(() => {
     const fetchVideoDetail = async () => {
       if (!id) return;
-      
+
       try {
         setLoading(true);
         const response = await fetch(API_ENDPOINTS.GET_POST_BY_ID(id || ''));
@@ -108,7 +107,7 @@ const VideoPage: React.FC = () => {
         }
         const data: PostDetail = await response.json();
         setVideoDetail(data);
-        
+
         // Lấy video liên quan sau khi có dữ liệu video
         setRelatedVideos(generateRelatedVideos());
       } catch (error) {
@@ -125,30 +124,30 @@ const VideoPage: React.FC = () => {
   // Navigate to previous video
   const goToPreviousVideo = useCallback(() => {
     if (isTransitioning || relatedVideos.length === 0) return;
-    
+
     setIsTransitioning(true);
     setTimeout(() => setIsTransitioning(false), 700);
-    
+
     setCurrentVideoIndex(prevIndex => {
       const newIndex = prevIndex === 0 ? relatedVideos.length - 1 : prevIndex - 1;
       return newIndex;
     });
-    
+
     if (!hasInteracted) setHasInteracted(true);
   }, [isTransitioning, relatedVideos, hasInteracted]);
 
   // Navigate to next video
   const goToNextVideo = useCallback(() => {
     if (isTransitioning || relatedVideos.length === 0) return;
-    
+
     setIsTransitioning(true);
     setTimeout(() => setIsTransitioning(false), 700);
-    
+
     setCurrentVideoIndex(prevIndex => {
       const newIndex = prevIndex === relatedVideos.length - 1 ? 0 : prevIndex + 1;
       return newIndex;
     });
-    
+
     if (!hasInteracted) setHasInteracted(true);
   }, [isTransitioning, relatedVideos, hasInteracted]);
 
@@ -161,12 +160,12 @@ const VideoPage: React.FC = () => {
     const handleTouchEnd = (e: TouchEvent) => {
       const touchEndY = e.changedTouches[0].clientY;
       const swipeDistance = touchStartY.current - touchEndY;
-      
+
       // Minimum swipe distance to trigger video change
       const minSwipeDistance = 50;
-      
+
       if (Math.abs(swipeDistance) < minSwipeDistance) return;
-      
+
       if (swipeDistance > 0) {
         // Swiped up, go to next video
         goToNextVideo();
@@ -174,7 +173,7 @@ const VideoPage: React.FC = () => {
         // Swiped down, go to previous video
         goToPreviousVideo();
       }
-      
+
       if (!hasInteracted) setHasInteracted(true);
     };
 
@@ -194,7 +193,7 @@ const VideoPage: React.FC = () => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      switch(e.key) {
+      switch (e.key) {
         case 'ArrowUp':
           goToPreviousVideo();
           break;
@@ -219,10 +218,10 @@ const VideoPage: React.FC = () => {
   // Nếu đang tải, hiển thị loading
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         backgroundColor: '#f5f7fa'
       }}>
@@ -234,17 +233,17 @@ const VideoPage: React.FC = () => {
   // Nếu không có dữ liệu, hiển thị thông báo lỗi
   if (!videoDetail) {
     return (
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         backgroundColor: '#f5f7fa',
         padding: '20px',
         textAlign: 'center'
       }}>
-        <Title level={3}>Không tìm thấy video</Title>
+        <h3 style={{ color: "#1e3c72", fontWeight: "bold" }}>Không tìm thấy video</h3>
         <p>Video bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
         <Button type="primary" onClick={() => navigate('/list')}>
           Quay lại danh sách
@@ -256,13 +255,13 @@ const VideoPage: React.FC = () => {
   // Chuyển đổi URL từ YouTube sang embed
   const getEmbedUrl = (youtubeUrl: string) => {
     if (!youtubeUrl) return '';
-    
-    const videoId = youtubeUrl.includes('youtube.com/watch?v=') 
+
+    const videoId = youtubeUrl.includes('youtube.com/watch?v=')
       ? youtubeUrl.split('watch?v=')[1]?.split('&')[0]
       : youtubeUrl.includes('youtu.be/')
         ? youtubeUrl.split('youtu.be/')[1]?.split('?')[0]
         : '';
-        
+
     return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : '';
   };
 
@@ -355,7 +354,7 @@ const VideoPage: React.FC = () => {
                     setIsTransitioning(true);
                     setTimeout(() => setIsTransitioning(false), 800);
                     setCurrentVideoIndex(prevIndex => {
-                      const newIndex = btn.dir > 0 
+                      const newIndex = btn.dir > 0
                         ? (prevIndex + 1) % relatedVideos.length
                         : (prevIndex - 1 + relatedVideos.length) % relatedVideos.length;
                       return newIndex;
@@ -537,8 +536,8 @@ const VideoPage: React.FC = () => {
                 Video liên quan
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {relatedVideos.map((video, index) => (
-                  <div 
+                {relatedVideos.map((video) => (
+                  <div
                     key={video.id}
                     style={{
                       display: 'flex',
@@ -557,15 +556,15 @@ const VideoPage: React.FC = () => {
                       e.currentTarget.style.backgroundColor = '#f8f9fa';
                     }}
                   >
-                    <img 
-                      src={video.thumbnail} 
+                    <img
+                      src={video.thumbnail}
                       alt={video.title}
-                      style={{ 
-                        width: '80px', 
-                        height: '60px', 
-                        objectFit: 'cover', 
-                        borderRadius: '6px' 
-                      }} 
+                      style={{
+                        width: '80px',
+                        height: '60px',
+                        objectFit: 'cover',
+                        borderRadius: '6px'
+                      }}
                     />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '4px' }}>{video.title}</div>

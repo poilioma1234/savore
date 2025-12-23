@@ -1,5 +1,6 @@
+import type { AuthResponse, LoginRequest, RegisterRequest } from '@/types/auth';
 import { API_ENDPOINTS } from '../config/api';
-import { LoginRequest, RegisterRequest, AuthResponse, ApiResponse, ApiError } from '../types/auth';
+
 
 // Service xử lý authentication
 export const authService = {

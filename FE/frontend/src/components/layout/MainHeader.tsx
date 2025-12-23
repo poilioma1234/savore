@@ -127,7 +127,7 @@ const MainHeader: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Space>
           <Text style={{ color: 'white', marginRight: '8px' }}>
-            Xin chào, {user?.fullName || user?.username}
+            Xin chào, {user?.fullName}
           </Text>
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <Button
