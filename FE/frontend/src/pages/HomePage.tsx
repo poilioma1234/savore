@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Typography, Button, Row, Col, Card, Spin, message } from "antd";
+import { Typography, Button, Row, Col, Card, Spin, message, FloatButton } from "antd";
 import {
   PlayCircleOutlined,
   FireOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from '../config/api';
@@ -118,6 +119,11 @@ const HomePage: React.FC = () => {
   // Điều hướng đến trang chi tiết video
   const viewVideo = (videoId: string) => {
     navigate(`/video/${videoId}`);
+  };
+  
+  // Điều hướng đến trang profile người dùng
+  const viewUserProfile = (userId: number) => {
+    navigate(`/profile/${userId}`);
   };
 
   // Render badge "Hot" cho video nổi bật
@@ -298,7 +304,18 @@ const HomePage: React.FC = () => {
                         }
                         description={
                           <div>
-                            <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+                            <div 
+                              style={{ 
+                                fontSize: '12px', 
+                                color: '#666', 
+                                marginBottom: '8px',
+                                cursor: 'pointer'
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                viewUserProfile(video.user.id);
+                              }}
+                            >
                               {video.user.fullName}
                             </div>
                             <Button 
@@ -348,6 +365,19 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </div>
+      
+      {/* Float Button để tạo bài viết mới */}
+      <FloatButton
+        icon={<PlusOutlined />}
+        type="primary"
+        tooltip="Tạo bài viết mới"
+        onClick={() => navigate('/create-post')}
+        style={{
+          background: 'linear-gradient(135deg, #FF7A18 0%, #FF9558 100%)',
+          right: 24,
+          bottom: 24,
+        }}
+      />
     </div>
   );
 };

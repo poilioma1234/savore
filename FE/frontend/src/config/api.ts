@@ -10,7 +10,8 @@ export const API_ENDPOINTS = {
   
   // Posts
   GET_POSTS: `${API_BASE_URL}/posts`,
-  GET_POST_BY_ID: (id: string) => `${API_BASE_URL}/posts/${id}`,  
+  GET_POST_BY_ID: (id: string) => `${API_BASE_URL}/posts/${id}`,
+  CREATE_POST: `${API_BASE_URL}/posts`,  
   // Ingredients
   GET_INGREDIENTS: `${API_BASE_URL}/ingredients`,
   GET_INGREDIENT_BY_ID: (id: string) => `${API_BASE_URL}/ingredients/${id}`,  

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { App as AntApp } from 'antd'
 import HomePage from '@/pages/HomePage'
 import DashboardPage from '@/pages/DashboardPage'
+import CreatePostPage from '@/pages/CreatePostPage'
+import ProfilePage from '@/pages/ProfilePage'
 import { useAuthStore } from '@/stores/authStore'
 import './App.css'
 import LoginPage from './pages/auth/login/LoginPage'
@@ -113,6 +115,24 @@ function App() {
             element={
               <MainLayout>
                 <ShopPage />
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/create-post" 
+            element={
+              <MainLayout>
+                <AuthRoute>
+                  <CreatePostPage />
+                </AuthRoute>
+              </MainLayout>
+            } 
+          />
+          <Route 
+            path="/profile/:userId" 
+            element={
+              <MainLayout>
+                <ProfilePage />
               </MainLayout>
             } 
           />
