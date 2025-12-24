@@ -45,8 +45,8 @@ async function bootstrap() {
     customCss: '.swagger-ui .topbar { display: none }',
   });
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3000}`);
-  console.log(`Swagger UI is running on: http://localhost:${process.env.PORT ?? 3000}/api`);
+  await app.listen(process.env.PORT ?? 3003);
+  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3003}`);
+  console.log(`Swagger UI is running on: http://localhost:${process.env.PORT ?? 3003}/api`);
 }
 bootstrap();

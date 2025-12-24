@@ -7,12 +7,13 @@ import { UpdatePostDto } from './dto/update-post.dto';
 export class PostsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(createPostDto: CreatePostDto) {
+    async create(createPostDto: CreatePostDto, userId: number) {
         const { recipeItems, ...postData } = createPostDto;
 
         return this.prisma.post.create({
             data: {
                 ...postData,
+                userId, // Automatically use logged-in user's ID
                 recipeItems: {
                     create: recipeItems.map((item) => ({
                         ingredientId: item.ingredientId,

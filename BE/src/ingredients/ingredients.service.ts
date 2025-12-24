@@ -7,9 +7,12 @@ import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 export class IngredientsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(createIngredientDto: CreateIngredientDto) {
+    async create(createIngredientDto: CreateIngredientDto, userId: number) {
         return this.prisma.ingredient.create({
-            data: createIngredientDto,
+            data: {
+                ...createIngredientDto,
+                providerId: userId, // Automatically use logged-in user's ID
+            },
             include: {
                 provider: {
                     select: {

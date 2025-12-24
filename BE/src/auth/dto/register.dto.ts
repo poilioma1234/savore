@@ -24,7 +24,7 @@ export class RegisterDto {
     @IsIn(['USER', 'CREATOR', 'SUPPLIER'])
     role: 'USER' | 'CREATOR' | 'SUPPLIER';
 
-    // ==================== YÊU CẦU MENTOR #1: PROVIDER ADDRESS ====================
+    // ==================== YÊU CẦU PROVIDER ADDRESS ====================
     @ApiProperty({
         example: '123 Nguyễn Huệ, Quận 1, TP.HCM',
         required: false,

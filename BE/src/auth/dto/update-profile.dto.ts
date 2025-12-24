@@ -3,8 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
     @ApiProperty({ example: 'Nguyễn Văn A', required: false })
-    @IsString()
     @IsOptional()
+    @IsString()
     fullName?: string;
 
     @ApiProperty({
@@ -12,8 +12,8 @@ export class UpdateProfileDto {
         required: false,
         description: 'Địa chỉ đầy đủ'
     })
-    @IsString()
     @IsOptional()
+    @IsString()
     address?: string;
 
     @ApiProperty({
@@ -23,10 +23,10 @@ export class UpdateProfileDto {
         minimum: -90,
         maximum: 90
     })
+    @IsOptional()
     @IsNumber()
     @Min(-90)
     @Max(90)
-    @IsOptional()
     latitude?: number;
 
     @ApiProperty({
@@ -36,9 +36,9 @@ export class UpdateProfileDto {
         minimum: -180,
         maximum: 180
     })
+    @IsOptional()
     @IsNumber()
     @Min(-180)
     @Max(180)
-    @IsOptional()
     longitude?: number;
 }

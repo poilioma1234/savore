@@ -26,13 +26,13 @@ export class PostsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('CREATOR')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Create a new post (CREATOR only)' })
     @ApiResponse({ status: 201, description: 'Post created successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - CREATOR role required' })
     @Post()
-    create(@Body() createPostDto: CreatePostDto) {
-        return this.postsService.create(createPostDto);
+    create(@Body() createPostDto: CreatePostDto, @Request() req) {
+        return this.postsService.create(createPostDto, req.user.userId);
     }
 
     // API ĐẶC BIỆT THEO YÊU CẦU MENTOR
@@ -77,7 +77,7 @@ export class PostsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('CREATOR')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Update post (CREATOR only - own posts)' })
     @ApiResponse({ status: 200, description: 'Post updated successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Can only update own posts' })
@@ -93,7 +93,7 @@ export class PostsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('CREATOR')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Delete post (CREATOR only - own posts)' })
     @ApiResponse({ status: 200, description: 'Post deleted successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own posts' })

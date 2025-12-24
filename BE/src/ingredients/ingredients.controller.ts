@@ -25,13 +25,13 @@ export class IngredientsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('SUPPLIER')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Create a new ingredient (SUPPLIER only)' })
     @ApiResponse({ status: 201, description: 'Ingredient created successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - SUPPLIER role required' })
     @Post()
-    create(@Body() createIngredientDto: CreateIngredientDto) {
-        return this.ingredientsService.create(createIngredientDto);
+    create(@Body() createIngredientDto: CreateIngredientDto, @Request() req) {
+        return this.ingredientsService.create(createIngredientDto, req.user.userId);
     }
 
     // ==================== YÊU CẦU MENTOR #4: FILTER BY PROVIDER ID ====================
@@ -67,7 +67,7 @@ export class IngredientsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('SUPPLIER')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Update ingredient (SUPPLIER only - own ingredients)' })
     @ApiResponse({ status: 200, description: 'Ingredient updated successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Can only update own ingredients' })
@@ -83,7 +83,7 @@ export class IngredientsController {
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('SUPPLIER')
-    @ApiBearerAuth()
+    @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Delete ingredient (SUPPLIER only - own ingredients)' })
     @ApiResponse({ status: 200, description: 'Ingredient deleted successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own ingredients' })

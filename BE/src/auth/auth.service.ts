@@ -72,7 +72,7 @@ export class AuthService {
         };
 
         return {
-            access_token: this.jwtService.sign(payload),
+            accessToken: this.jwtService.sign(payload),
             user: {
                 id: user.id,
                 email: user.email,
@@ -117,7 +117,7 @@ export class AuthService {
         };
 
         return {
-            access_token: this.jwtService.sign(payload),
+            accessToken: this.jwtService.sign(payload),
             user: {
                 id: user.id,
                 email: user.email,
@@ -170,15 +170,32 @@ export class AuthService {
             throw new NotFoundException('User not found');
         }
 
+        // DEBUG: Log incoming data
+        console.log('📥 Received updateProfileDto:', updateProfileDto);
+
+        // Build update data object - only include fields that are provided
+        const updateData: any = {};
+
+        if (updateProfileDto.fullName !== undefined) {
+            updateData.fullName = updateProfileDto.fullName;
+        }
+        if (updateProfileDto.address !== undefined) {
+            updateData.address = updateProfileDto.address;
+        }
+        if (updateProfileDto.latitude !== undefined) {
+            updateData.latitude = updateProfileDto.latitude;
+        }
+        if (updateProfileDto.longitude !== undefined) {
+            updateData.longitude = updateProfileDto.longitude;
+        }
+
+        // DEBUG: Log what will be updated
+        console.log('🔄 Update data to be sent to Prisma:', updateData);
+
         // Update user
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
-            data: {
-                fullName: updateProfileDto.fullName,
-                address: updateProfileDto.address,
-                latitude: updateProfileDto.latitude,
-                longitude: updateProfileDto.longitude,
-            },
+            data: updateData,
             include: {
                 userRoles: {
                     include: {

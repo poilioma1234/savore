@@ -14,14 +14,25 @@ import { AssignRoleDto } from './dto/assign-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 
+@ApiTags('Admin')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
+@ApiBearerAuth('JWT-auth')
 export class AdminController {
     constructor(private readonly adminService: AdminService) { }
 
     @Get('users')
+    @ApiOperation({ summary: 'Get all users with pagination and filters (ADMIN only)' })
+    @ApiQuery({ name: 'page', required: false, example: 1, description: 'Số trang' })
+    @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Số lượng items mỗi trang' })
+    @ApiQuery({ name: 'search', required: false, example: 'john@example.com', description: 'Tìm kiếm theo email hoặc tên' })
+    @ApiQuery({ name: 'role', required: false, example: 'SUPPLIER', description: 'Lọc theo role' })
+    @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
     getAllUsers(
         @Query('page') page?: string,
         @Query('limit') limit?: string,
@@ -34,11 +45,21 @@ export class AdminController {
     }
 
     @Get('users/:id')
+    @ApiOperation({ summary: 'Get user by ID (ADMIN only)' })
+    @ApiParam({ name: 'id', example: 1, description: 'User ID' })
+    @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
     getUserById(@Param('id', ParseIntPipe) id: number) {
         return this.adminService.getUserById(id);
     }
 
     @Post('users/:id/roles')
+    @ApiOperation({ summary: 'Assign role to user (ADMIN only)' })
+    @ApiParam({ name: 'id', example: 1, description: 'User ID' })
+    @ApiResponse({ status: 200, description: 'Role assigned successfully' })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
     assignRole(
         @Param('id', ParseIntPipe) id: number,
         @Body() assignRoleDto: AssignRoleDto,
@@ -47,6 +68,12 @@ export class AdminController {
     }
 
     @Delete('users/:id/roles/:roleId')
+    @ApiOperation({ summary: 'Remove role from user (ADMIN only)' })
+    @ApiParam({ name: 'id', example: 1, description: 'User ID' })
+    @ApiParam({ name: 'roleId', example: 2, description: 'Role ID to remove' })
+    @ApiResponse({ status: 200, description: 'Role removed successfully' })
+    @ApiResponse({ status: 404, description: 'User or role not found' })
+    @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
     removeRole(
         @Param('id', ParseIntPipe) userId: number,
         @Param('roleId', ParseIntPipe) roleId: number,
@@ -55,6 +82,9 @@ export class AdminController {
     }
 
     @Get('dashboard/stats')
+    @ApiOperation({ summary: 'Get dashboard statistics (ADMIN only)' })
+    @ApiResponse({ status: 200, description: 'Dashboard stats retrieved successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
     getDashboardStats() {
         return this.adminService.getDashboardStats();
     }
