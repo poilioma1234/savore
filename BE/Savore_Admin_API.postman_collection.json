@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "Savore Admin API",
+    "description": "Admin API endpoints for Savore backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Login Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"adminToken\", jsonData.accessToken);",
+              "console.log(\"✅ Admin token saved:\", jsonData.accessToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@savore.com\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        },
+        "description": "Login với tài khoản admin để lấy access token"
+      }
+    },
+    {
+      "name": "2. Get All Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1",
+              "description": "Số trang"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Số items mỗi trang"
+            }
+          ]
+        },
+        "description": "Lấy danh sách tất cả users với pagination"
+      }
+    },
+    {
+      "name": "3. Search Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?search=creator",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users"],
+          "query": [
+            {
+              "key": "search",
+              "value": "creator",
+              "description": "Tìm kiếm theo email hoặc tên"
+            }
+          ]
+        },
+        "description": "Tìm kiếm users theo email hoặc tên"
+      }
+    },
+    {
+      "name": "4. Filter Users by Role - SUPPLIER",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?role=SUPPLIER",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users"],
+          "query": [
+            {
+              "key": "role",
+              "value": "SUPPLIER",
+              "description": "Lọc theo role: ADMIN, CREATOR, USER, SUPPLIER"
+            }
+          ]
+        },
+        "description": "Lọc users theo role SUPPLIER"
+      }
+    },
+    {
+      "name": "5. Filter Users by Role - CREATOR",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?role=CREATOR",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users"],
+          "query": [
+            {
+              "key": "role",
+              "value": "CREATOR",
+              "description": "Lọc theo role CREATOR"
+            }
+          ]
+        },
+        "description": "Lọc users theo role CREATOR"
+      }
+    },
+    {
+      "name": "6. Get User Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users/2",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users", "2"]
+        },
+        "description": "Xem chi tiết user theo ID (bao gồm posts và ingredients gần nhất)"
+      }
+    },
+    {
+      "name": "7. Assign Role to User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roleCode\": \"CREATOR\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/users/3/roles",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users", "3", "roles"]
+        },
+        "description": "Gán role CREATOR cho user ID 3"
+      }
+    },
+    {
+      "name": "8. Remove Role from User",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users/3/roles/2",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users", "3", "roles", "2"]
+        },
+        "description": "Xóa role ID 2 (CREATOR) khỏi user ID 3"
+      }
+    },
+    {
+      "name": "9. Dashboard Stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/dashboard/stats",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "dashboard", "stats"]
+        },
+        "description": "Lấy thống kê tổng quan: tổng users, posts, ingredients, phân bố roles"
+      }
+    },
+    {
+      "name": "10. Combined Search + Filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?role=SUPPLIER&search=organic&page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin", "users"],
+          "query": [
+            {
+              "key": "role",
+              "value": "SUPPLIER"
+            },
+            {
+              "key": "search",
+              "value": "organic"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Kết hợp filter theo role SUPPLIER và search 'organic'"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://103.6.234.20:3018",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
