@@ -59,7 +59,7 @@ const MainHeader: React.FC = () => {
       key: 'profile',
       icon: <UserOutlined />,
       label: 'Hồ sơ',
-      onClick: () => navigate('/profile'),
+      onClick: () => user ? navigate(`/profile/${user.id}`) : navigate('/login'),
     },
     {
       key: 'logout',

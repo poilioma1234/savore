@@ -214,6 +214,11 @@ const VideoPage: React.FC = () => {
   const viewRelatedVideo = (videoId: string) => {
     navigate(`/video/${videoId}`);
   };
+  
+  // Điều hướng đến trang profile người dùng
+  const viewUserProfile = (userId: number) => {
+    navigate(`/profile/${userId}`);
+  };
 
   // Nếu đang tải, hiển thị loading
   if (loading) {
@@ -477,7 +482,17 @@ const VideoPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <Avatar size={70} src={`https://i.pravatar.cc/150?img=${videoDetail.user.id}`} icon={<UserOutlined />} style={{ border: '3px solid #FF7A18' }} />
                 <div>
-                  <div style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a' }}>{videoDetail.user.fullName}</div>
+                  <div 
+                    style={{ 
+                      fontSize: '20px', 
+                      fontWeight: '800', 
+                      color: '#1a1a1a',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => viewUserProfile(videoDetail.user.id)}
+                  >
+                    {videoDetail.user.fullName}
+                  </div>
                   <div style={{ color: '#FF7A18', fontWeight: '500' }}>Chuyên gia ẩm thực</div>
                 </div>
               </div>
