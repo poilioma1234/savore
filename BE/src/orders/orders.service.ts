@@ -32,9 +32,11 @@ export class OrdersService {
             throw new BadRequestException('Some products not found');
         }
 
-        // Calculate total price
+        // Calculate total price and prepare data
         let totalPrice = 0;
         const orderItemsData: any[] = [];
+        const supplierPayments = new Map<number, number>(); // supplierId -> amount
+        const creatorPayments = new Map<number, number>(); // creatorId -> amount
 
         for (const item of orderItems) {
             const product = products.find(p => p.id === item.productId);
@@ -45,10 +47,19 @@ export class OrdersService {
             const itemTotal = Number(product.price) * item.quantity;
             totalPrice += itemTotal;
 
-            // Commission calculation (10% for creator if sourcePostId provided)
-            const commissionRate = item.creatorId && item.sourcePostId ? 10 : 0;
+            // Commission calculation (5% for creator if sourcePostId provided)
+            const commissionRate = item.creatorId && item.sourcePostId ? 5 : 0;
             const commissionAmount = (itemTotal * commissionRate) / 100;
             const supplierAmount = itemTotal - commissionAmount;
+
+            // Track payments
+            const currentSupplierAmount = supplierPayments.get(product.supplierId) || 0;
+            supplierPayments.set(product.supplierId, currentSupplierAmount + supplierAmount);
+
+            if (item.creatorId && commissionAmount > 0) {
+                const currentCreatorAmount = creatorPayments.get(item.creatorId) || 0;
+                creatorPayments.set(item.creatorId, currentCreatorAmount + commissionAmount);
+            }
 
             orderItemsData.push({
                 productId: item.productId,
@@ -72,7 +83,7 @@ export class OrdersService {
             );
         }
 
-        // Create order with order items and update wallet in a transaction
+        // Create order and update wallets in a transaction
         const order = await this.prisma.$transaction(async (prisma) => {
             // Create order
             const newOrder = await prisma.order.create({
@@ -106,35 +117,104 @@ export class OrdersService {
                 },
             });
 
-            // Deduct from wallet
-            const newBalance = currentBalance - totalPrice;
+            // Deduct from user wallet
+            const newUserBalance = currentBalance - totalPrice;
             await prisma.wallet.update({
                 where: { userId },
-                data: { balance: newBalance },
+                data: { balance: newUserBalance },
             });
 
-            // Create transaction record
+            // Create user transaction record
             await prisma.transaction.create({
                 data: {
                     walletId: wallet.id,
-                    amount: -totalPrice, // Negative for deduction
+                    amount: -totalPrice,
                     type: 'DEBIT',
                     sourceType: 'ORDER',
                     sourceId: newOrder.id,
-                    balanceAfter: newBalance,
+                    balanceAfter: newUserBalance,
                     status: 'COMPLETED',
                 },
             });
+
+            // Add to supplier wallets
+            for (const [supplierId, amount] of supplierPayments.entries()) {
+                const supplierWallet = await prisma.wallet.findUnique({
+                    where: { userId: supplierId }
+                });
+
+                if (supplierWallet) {
+                    const newSupplierBalance = Number(supplierWallet.balance) + amount;
+                    await prisma.wallet.update({
+                        where: { userId: supplierId },
+                        data: { balance: newSupplierBalance },
+                    });
+
+                    // Create supplier transaction
+                    await prisma.transaction.create({
+                        data: {
+                            walletId: supplierWallet.id,
+                            amount: amount,
+                            type: 'CREDIT',
+                            sourceType: 'ORDER',
+                            sourceId: newOrder.id,
+                            balanceAfter: newSupplierBalance,
+                            status: 'COMPLETED',
+                        },
+                    });
+                }
+            }
+
+            // Add to creator wallets (5% commission)
+            for (const [creatorId, amount] of creatorPayments.entries()) {
+                const creatorWallet = await prisma.wallet.findUnique({
+                    where: { userId: creatorId }
+                });
+
+                if (creatorWallet) {
+                    const newCreatorBalance = Number(creatorWallet.balance) + amount;
+                    await prisma.wallet.update({
+                        where: { userId: creatorId },
+                        data: { balance: newCreatorBalance },
+                    });
+
+                    // Create creator transaction
+                    await prisma.transaction.create({
+                        data: {
+                            walletId: creatorWallet.id,
+                            amount: amount,
+                            type: 'CREDIT',
+                            sourceType: 'COMMISSION',
+                            sourceId: newOrder.id,
+                            balanceAfter: newCreatorBalance,
+                            status: 'COMPLETED',
+                        },
+                    });
+                }
+            }
 
             return newOrder;
         });
 
         return {
             success: true,
-            message: 'Order created successfully. Payment deducted from wallet.',
+            message: 'Order created successfully. Payment processed.',
             data: {
                 ...order,
-                walletBalance: currentBalance - totalPrice,
+                userWalletBalance: currentBalance - totalPrice,
+                paymentSummary: {
+                    total: totalPrice,
+                    suppliers: Array.from(supplierPayments.entries()).map(([id, amount]) => ({
+                        supplierId: id,
+                        amount: amount,
+                        percentage: 95
+                    })),
+                    creators: Array.from(creatorPayments.entries()).map(([id, amount]) => ({
+                        creatorId: id,
+                        amount: amount,
+                        percentage: 5
+                    }))
+                }
             },
         };
     }
