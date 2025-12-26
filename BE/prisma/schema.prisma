@@ -95,38 +95,38 @@ model Product {
 }
 
 model Post {
-  id                String           @id @default(uuid()) @db.Uuid
-  userId            Int              @map("user_id")
-  linkVideo         String           @map("link_video")
-  thumbnail         String?
-  name              String
-  description       String?          @db.Text
-  cookingSteps      String[]         @map("cooking_steps") @default([])
-  tagIds            Int[]            @map("tag_ids") @default([])
-  status            String           @default("DRAFT")
-  rating            Decimal          @default(0) @db.Decimal(3, 1)
-  view              Int              @default(0)
-  createdAt         DateTime         @default(now()) @map("created_at")
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipeItems       RecipeItem[]
-  orderItems        OrderItem[]
-  comments          Comment[]
-  likes             Like[]
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       Int          @map("user_id")
+  linkVideo    String       @map("link_video")
+  thumbnail    String?
+  name         String
+  description  String?      @db.Text
+  cookingSteps String[]     @default([]) @map("cooking_steps")
+  tagIds       Int[]        @default([]) @map("tag_ids")
+  status       String       @default("DRAFT")
+  rating       Decimal      @default(0) @db.Decimal(3, 1)
+  view         Int          @default(0)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeItems  RecipeItem[]
+  orderItems   OrderItem[]
+  comments     Comment[]
+  likes        Like[]
 
   @@map("posts")
 }
 
 model Comment {
-  id                String           @id @default(uuid()) @db.Uuid
-  postId            String           @map("post_id") @db.Uuid
-  userId            Int              @map("user_id")
-  description       String           @db.Text
-  images            String[]         @default([])
-  isRatingComment   Boolean          @default(false) @map("is_rating_comment")
-  rating            Decimal?         @db.Decimal(2, 1)
-  createdAt         DateTime         @default(now()) @map("created_at")
-  post              Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(uuid()) @db.Uuid
+  postId          String   @map("post_id") @db.Uuid
+  userId          Int      @map("user_id")
+  description     String   @db.Text
+  images          String[] @default([])
+  isRatingComment Boolean  @default(false) @map("is_rating_comment")
+  rating          Decimal? @db.Decimal(2, 1)
+  createdAt       DateTime @default(now()) @map("created_at")
+  post            Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
@@ -135,6 +135,7 @@ model Ingredient {
   id          String       @id @default(uuid()) @db.Uuid
   name        String
   tag         String
+  pricePerKg  Decimal      @map("price_per_kg") @db.Decimal(15, 2)
   providerId  Int          @map("provider_id")
   createdAt   DateTime     @default(now()) @map("created_at")
   provider    User         @relation("ProviderIngredients", fields: [providerId], references: [id], onDelete: Cascade)
@@ -154,7 +155,6 @@ model RecipeItem {
 
   @@map("recipe_items")
 }
-
 
 model Order {
   id         Int         @id @default(autoincrement())

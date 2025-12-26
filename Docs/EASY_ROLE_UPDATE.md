@@ -13,7 +13,7 @@ Thay thế **TẤT CẢ** roles của user bằng array mới!
 ### **1. Đổi user thành CREATOR:**
 
 ```
-PUT http://103.6.234.20:3018/admin/users/3/roles
+PUT http://103.6.234.20:3003/admin/users/3/roles
 
 Headers:
 Authorization: Bearer {adminToken}
@@ -38,7 +38,7 @@ Body:
 ### **2. Đổi user thành CREATOR + USER (nhiều roles):**
 
 ```
-PUT http://103.6.234.20:3018/admin/users/3/roles
+PUT http://103.6.234.20:3003/admin/users/3/roles
 
 Body:
 {
@@ -51,7 +51,7 @@ Body:
 ### **3. Đổi user thành SUPPLIER:**
 
 ```
-PUT http://103.6.234.20:3018/admin/users/3/roles
+PUT http://103.6.234.20:3003/admin/users/3/roles
 
 Body:
 {

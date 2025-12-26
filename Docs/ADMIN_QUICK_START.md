@@ -22,7 +22,7 @@
 
 ### 1. Login Admin
 ```
-POST http://103.6.234.20:3018/auth/login
+POST http://103.6.234.20:3003/auth/login
 
 Body:
 {
@@ -35,7 +35,7 @@ Body:
 
 ### 2. Lấy tất cả users
 ```
-GET http://103.6.234.20:3018/admin/users?page=1&limit=10
+GET http://103.6.234.20:3003/admin/users?page=1&limit=10
 
 Headers:
 Authorization: Bearer {accessToken}

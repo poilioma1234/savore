@@ -16,7 +16,7 @@
 
 ### Request
 ```
-POST http://103.6.234.20:3018/auth/login
+POST http://103.6.234.20:3003/auth/login
 ```
 
 ### Body (JSON)
@@ -48,7 +48,7 @@ POST http://103.6.234.20:3018/auth/login
 
 ### Request
 ```
-GET http://103.6.234.20:3018/admin/users?page=1&limit=10
+GET http://103.6.234.20:3003/admin/users?page=1&limit=10
 ```
 
 ### Headers
@@ -150,7 +150,7 @@ Authorization: Bearer {accessToken}
 
 ### Request
 ```
-GET http://103.6.234.20:3018/admin/users?search=creator
+GET http://103.6.234.20:3003/admin/users?search=creator
 ```
 
 ### Headers
@@ -201,7 +201,7 @@ GET /admin/users?search=creator
 
 ### Request
 ```
-GET http://103.6.234.20:3018/admin/users?role=SUPPLIER
+GET http://103.6.234.20:3003/admin/users?role=SUPPLIER
 ```
 
 ### Headers
@@ -269,7 +269,7 @@ GET /admin/users?role=SUPPLIER&search=organic
 
 ### Request
 ```
-GET http://103.6.234.20:3018/admin/users/2
+GET http://103.6.234.20:3003/admin/users/2
 ```
 
 ### Headers
@@ -316,7 +316,7 @@ Authorization: Bearer {accessToken}
 
 ### Request
 ```
-POST http://103.6.234.20:3018/admin/users/3/roles
+POST http://103.6.234.20:3003/admin/users/3/roles
 ```
 
 ### Headers
@@ -364,7 +364,7 @@ POST /admin/users/3/roles
 
 ### Request
 ```
-DELETE http://103.6.234.20:3018/admin/users/3/roles/2
+DELETE http://103.6.234.20:3003/admin/users/3/roles/2
 ```
 
 ### Headers
@@ -408,7 +408,7 @@ DELETE /admin/users/5/roles/4
 
 ### Request
 ```
-GET http://103.6.234.20:3018/admin/dashboard/stats
+GET http://103.6.234.20:3003/admin/dashboard/stats
 ```
 
 ### Headers
@@ -482,7 +482,7 @@ Authorization: Bearer {accessToken}
 3. Tên: "Savore Production"
 4. Variables:
    ```
-   baseUrl: http://103.6.234.20:3018
+   baseUrl: http://103.6.234.20:3003
    adminToken: (để trống, sẽ tự động set sau khi login)
    ```
 

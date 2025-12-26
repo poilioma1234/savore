@@ -93,7 +93,7 @@ pm2 logs savore-api --lines 30
 ### **Test login với multi-role user:**
 
 ```bash
-curl -X POST http://103.6.234.20:3018/auth/login \
+curl -X POST http://103.6.234.20:3003/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "hybrid1@savore.com",
@@ -194,13 +194,13 @@ node prisma/seed-users.mjs
 ### **Xem tất cả users:**
 
 ```bash
-curl -X POST http://103.6.234.20:3018/auth/login \
+curl -X POST http://103.6.234.20:3003/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@savore.com","password":"admin123"}' \
   | jq -r '.accessToken'
 
 # Copy token, sau đó:
-curl -X GET "http://103.6.234.20:3018/admin/users?limit=20" \
+curl -X GET "http://103.6.234.20:3003/admin/users?limit=20" \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -214,12 +214,12 @@ curl -X GET "http://103.6.234.20:3018/admin/users?limit=20" \
 
 ```bash
 # 1. Login
-curl -X POST http://103.6.234.20:3018/auth/login \
+curl -X POST http://103.6.234.20:3003/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"hybrid1@savore.com","password":"hybrid123"}'
 
 # 2. Tạo post (vì có role CREATOR)
-curl -X POST http://103.6.234.20:3018/posts \
+curl -X POST http://103.6.234.20:3003/posts \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -230,7 +230,7 @@ curl -X POST http://103.6.234.20:3018/posts \
   }'
 
 # 3. Like post (vì có role USER)
-curl -X POST http://103.6.234.20:3018/likes \
+curl -X POST http://103.6.234.20:3003/likes \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{"postId": "{post_id}"}'

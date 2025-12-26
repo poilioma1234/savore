@@ -119,7 +119,7 @@ chmod +x /var/www/savore/BE/deploy.sh
 
 ### **1. Test endpoint mới:**
 ```
-PUT http://103.6.234.20:3018/admin/users/3/roles
+PUT http://103.6.234.20:3003/admin/users/3/roles
 
 Headers:
 Authorization: Bearer {token}
@@ -132,7 +132,7 @@ Body:
 
 ### **2. Xem Swagger:**
 ```
-http://103.6.234.20:3018/api
+http://103.6.234.20:3003/api
 ```
 
 ---

@@ -146,18 +146,18 @@ async function main() {
         // ==================== SEED INGREDIENTS ====================
         console.log('\n🥬 Creating ingredients...');
         const ingredientsData = [
-            { name: 'Thịt gà ta', tag: 'gà', providerId: supplierUser.id },
-            { name: 'Thịt gà công nghiệp', tag: 'gà', providerId: supplierUser2.id },
-            { name: 'Sả', tag: 'gia vị', providerId: supplierUser.id },
-            { name: 'Ớt', tag: 'gia vị', providerId: supplierUser.id },
-            { name: 'Tỏi', tag: 'gia vị', providerId: supplierUser2.id },
-            { name: 'Hành tím', tag: 'gia vị', providerId: supplierUser2.id },
-            { name: 'Nước mắm', tag: 'gia vị', providerId: supplierUser.id },
-            { name: 'Đường', tag: 'gia vị', providerId: supplierUser.id },
-            { name: 'Thịt bò', tag: 'bò', providerId: supplierUser.id },
-            { name: 'Rau muống', tag: 'rau', providerId: supplierUser2.id },
-            { name: 'Cà chua', tag: 'rau', providerId: supplierUser.id },
-            { name: 'Trứng gà', tag: 'trứng', providerId: supplierUser2.id },
+            { name: 'Thịt gà ta', tag: 'gà', providerId: supplierUser.id, pricePerKg: 150000 },
+            { name: 'Thịt gà công nghiệp', tag: 'gà', providerId: supplierUser2.id, pricePerKg: 85000 },
+            { name: 'Sả', tag: 'gia vị', providerId: supplierUser.id, pricePerKg: 20000 },
+            { name: 'Ớt', tag: 'gia vị', providerId: supplierUser.id, pricePerKg: 30000 },
+            { name: 'Tỏi', tag: 'gia vị', providerId: supplierUser2.id, pricePerKg: 40000 },
+            { name: 'Hành tím', tag: 'gia vị', providerId: supplierUser2.id, pricePerKg: 25000 },
+            { name: 'Nước mắm', tag: 'gia vị', providerId: supplierUser.id, pricePerKg: 50000 },
+            { name: 'Đường', tag: 'gia vị', providerId: supplierUser.id, pricePerKg: 18000 },
+            { name: 'Thịt bò', tag: 'bò', providerId: supplierUser.id, pricePerKg: 360000 },
+            { name: 'Rau muống', tag: 'rau', providerId: supplierUser2.id, pricePerKg: 15000 },
+            { name: 'Cà chua', tag: 'rau', providerId: supplierUser.id, pricePerKg: 30000 },
+            { name: 'Trứng gà', tag: 'trứng', providerId: supplierUser2.id, pricePerKg: 45000 },
         ];
 
         const ingredients = [];
@@ -167,6 +167,20 @@ async function main() {
             });
             ingredients.push(ingredient);
             console.log(`  ✅ Created: ${ingredient.name}`);
+        }
+
+        // ==================== SEED TAGS ====================
+        console.log('\n🏷️  Creating tags...');
+        const tagNames = ['Gà', 'Bò', 'Xào', 'Chiên', 'Rau', 'Trứng', 'Cà chua'];
+        const tags = [];
+        for (const tagName of tagNames) {
+            const tag = await prisma.tag.upsert({
+                where: { name: tagName },
+                update: {},
+                create: { name: tagName },
+            });
+            tags.push(tag);
+            console.log(`  ✅ Created/Found: ${tag.name} (ID: ${tag.id})`);
         }
 
         // ==================== SEED PRODUCTS ====================
@@ -201,12 +215,14 @@ async function main() {
                 thumbnail: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6',
                 name: 'Gà Xào Sả Ớt Thơm Ngon',
                 description: 'Món gà xào sả ớt đậm đà, thơm ngon, dễ làm cho bữa cơm gia đình',
-                cookingSteps: `Bước 1: Sơ chế gà, rửa sạch, chặt miếng vừa ăn
-Bước 2: Ướp gà với nước mắm, đường, tỏi băm trong 30 phút
-Bước 3: Đập dập sả, cắt khúc. Ớt cắt lát
-Bước 4: Phi thơm sả, ớt rồi cho gà vào xào
-Bước 5: Nêm nếm lại gia vị, xào đến khi gà chín vàng`,
-                tagVideo: ['gà', 'xào', 'sả ớt'],
+                cookingSteps: [
+                    'Bước 1: Sơ chế gà, rửa sạch, chặt miếng vừa ăn',
+                    'Bước 2: Ướp gà với nước mắm, đường, tỏi băm trong 30 phút',
+                    'Bước 3: Đập dập sả, cắt khúc. Ớt cắt lát',
+                    'Bước 4: Phi thơm sả, ớt rồi cho gà vào xào',
+                    'Bước 5: Nêm nếm lại gia vị, xào đến khi gà chín vàng'
+                ],
+                tagIds: [tags.find(t => t.name === 'Gà').id, tags.find(t => t.name === 'Xào').id],
                 status: 'PUBLISHED',
             },
         });
@@ -256,12 +272,14 @@ Bước 5: Nêm nếm lại gia vị, xào đến khi gà chín vàng`,
                 thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
                 name: 'Bò Xào Rau Muống',
                 description: 'Món bò xào rau muống giòn ngon, bổ dưỡng',
-                cookingSteps: `Bước 1: Thịt bò thái lát mỏng, ướp gia vị
-Bước 2: Rau muống nhặt sạch, cắt khúc
-Bước 3: Phi thơm tỏi, cho bò vào xào nhanh tay
-Bước 4: Cho rau muống vào xào cùng
-Bước 5: Nêm nếm và tắt bếp`,
-                tagVideo: ['bò', 'xào', 'rau muống'],
+                cookingSteps: [
+                    'Bước 1: Thịt bò thái lát mỏng, ướp gia vị',
+                    'Bước 2: Rau muống nhặt sạch, cắt khúc',
+                    'Bước 3: Phi thơm tỏi, cho bò vào xào nhanh tay',
+                    'Bước 4: Cho rau muống vào xào cùng',
+                    'Bước 5: Nêm nếm và tắt bếp'
+                ],
+                tagIds: [tags.find(t => t.name === 'Bò').id, tags.find(t => t.name === 'Xào').id, tags.find(t => t.name === 'Rau').id],
                 status: 'PUBLISHED',
             },
         });
@@ -304,12 +322,14 @@ Bước 5: Nêm nếm và tắt bếp`,
                 thumbnail: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
                 name: 'Trứng Chiên Cà Chua',
                 description: 'Món ăn đơn giản, nhanh gọn cho bữa sáng',
-                cookingSteps: `Bước 1: Cà chua rửa sạch, cắt múi cau
-Bước 2: Đập trứng vào bát, đánh tan
-Bước 3: Phi thơm hành tím, cho cà chua vào xào
-Bước 4: Đổ trứng vào, đảo đều
-Bước 5: Nêm gia vị vừa ăn`,
-                tagVideo: ['trứng', 'cà chua', 'chiên'],
+                cookingSteps: [
+                    'Bước 1: Cà chua rửa sạch, cắt múi cau',
+                    'Bước 2: Đập trứng vào bát, đánh tan',
+                    'Bước 3: Phi thơm hành tím, cho cà chua vào xào',
+                    'Bước 4: Đổ trứng vào, đảo đều',
+                    'Bước 5: Nêm gia vị vừa ăn'
+                ],
+                tagIds: [tags.find(t => t.name === 'Trứng').id, tags.find(t => t.name === 'Cà chua').id, tags.find(t => t.name === 'Chiên').id],
                 status: 'PUBLISHED',
             },
         });

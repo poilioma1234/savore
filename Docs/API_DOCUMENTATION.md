@@ -1,8 +1,8 @@
 # 📚 HƯỚNG DẪN SỬ DỤNG API - SAVORE BACKEND
 
-**Base URL:** `http://103.6.234.20:3018` (hoặc `http://localhost:3000` khi dev)
+**Base URL:** `http://103.6.234.20:3003` (hoặc `http://localhost:3000` khi dev)
 
-**Swagger UI:** `http://103.6.234.20:3018/api`
+**Swagger UI:** `http://103.6.234.20:3003/api`
 
 ---
 
@@ -700,6 +700,7 @@ Authorization: Bearer {accessToken}
       "id": "uuid-ing-1",
       "name": "Thịt gà",
       "tag": "Thịt",
+      "pricePerKg": "150000.00",
       "providerId": 5,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "provider": {
@@ -733,11 +734,29 @@ Authorization: Bearer {accessToken}
 ```json
 {
   "name": "Thịt gà",
-  "tag": "Thịt"
+  "tag": "Thịt",
+  "pricePerKg": 150000
 }
 ```
 
-**Note:** `providerId` tự động lấy từ user đang login.
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-ing-1",
+    "name": "Thịt gà",
+    "tag": "Thịt",
+    "pricePerKg": "150000.00",
+    "providerId": 5,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Note:** 
+- `providerId` tự động lấy từ user đang login.
+- `pricePerKg` là giá tiền 1kg nguyên liệu (VND), bắt buộc.
 
 ---
 

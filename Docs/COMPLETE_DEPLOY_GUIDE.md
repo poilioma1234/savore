@@ -180,12 +180,12 @@ cd /var/www/savore/BE
 
 ### **1. Test endpoint cũ:**
 ```
-GET http://103.6.234.20:3018/posts
+GET http://103.6.234.20:3003/posts
 ```
 
 ### **2. Test endpoint mới:**
 ```
-PUT http://103.6.234.20:3018/admin/users/3/roles
+PUT http://103.6.234.20:3003/admin/users/3/roles
 
 Headers:
 Authorization: Bearer {token}
@@ -198,7 +198,7 @@ Body:
 
 ### **3. Xem Swagger:**
 ```
-http://103.6.234.20:3018/api
+http://103.6.234.20:3003/api
 ```
 
 ---

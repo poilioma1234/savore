@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateIngredientDto {
@@ -17,4 +17,12 @@ export class CreateIngredientDto {
     @IsString()
     @IsNotEmpty()
     tag: string;
+
+    @ApiProperty({
+        example: 150000,
+        description: 'Giá tiền 1kg nguyên liệu (VND)'
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    pricePerKg: number;
 }
